@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "systogony"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
     { name="David Chandler", email="contact@dechandler.io" }
 ]
@@ -28,8 +28,8 @@ dependencies = [
 
 
 [project.urls]
-"Code" = "https://github.com/dechandler/systogony"
-"Documentation" = "https://github.com/dechandler/systogony/README.md"
+"Code" = "https://github.com/dechandler/systogony-core"
+"Documentation" = "https://github.com/dechandler/systogony-core/README.md"
 
 
 [tool.setuptools]
