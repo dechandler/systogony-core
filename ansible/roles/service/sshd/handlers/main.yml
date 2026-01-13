@@ -1,6 +1,0 @@
----
-- name: sshd restart
-  service:
-    name: "{{ sshd_service[ansible_distribution] }}"
-    state: restarted
-  become: True

@@ -1,8 +1,0 @@
----
-- include_tasks: common.yml
-  vars:
-    role: apk-community
-    files:
-      - setup.sh
-    executable_files:
-      - setup.sh

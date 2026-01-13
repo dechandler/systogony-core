@@ -1,9 +1,0 @@
----
-- name: >
-    modules/vpn
-    : Copy Script
-  copy:
-    src: modules/vpn.py
-    dest: /usr/local/libexec/py3status/vpn.py
-    mode: 0755
-  become: True

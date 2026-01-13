@@ -1,3 +1,0 @@
----
-- include_tasks: "{{ system }}/locale.yml"
-  when: system in ["debian"]

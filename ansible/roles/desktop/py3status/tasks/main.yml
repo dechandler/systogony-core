@@ -1,8 +1,0 @@
----
-- include_tasks: install.yml
-
-- include_tasks: user-config.yml
-  vars:
-    user:
-      name: root
-      home: /etc/skel

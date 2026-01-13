@@ -1,8 +1,0 @@
----
-- include_tasks: common.yml
-  vars:
-    role: grafana
-    files:
-      - setup.sh
-    executable_files:
-      - setup.sh

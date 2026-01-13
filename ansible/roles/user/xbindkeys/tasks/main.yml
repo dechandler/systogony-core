@@ -1,9 +1,0 @@
----
-- name: Xbindkeys | Config
-  copy:
-    src: "xbindkeysrc"
-    dest: "{{ user.home }}/.xbindkeysrc"
-    owner: "{{ user.name }}"
-    group: "{{ user.name }}"
-    mode: 0600
-  become: True

@@ -1,8 +1,0 @@
----
-- name: >
-    redhat/main
-    : Update Redhat-based systems
-  dnf:
-    name: '*'
-    state: latest
-  become: True

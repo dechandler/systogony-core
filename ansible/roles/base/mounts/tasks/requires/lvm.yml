@@ -1,8 +1,0 @@
----
-- name: >
-    requires/lvm
-    :
-  apt:
-    name: "{{ lvm_package[ ansible_facts.os_family ] }}"
-    state: installed
-  become: True

@@ -1,4 +1,0 @@
----
-- include_tasks: xorg.yml
-
-- include_tasks: wayland.yml

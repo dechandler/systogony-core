@@ -1,8 +1,0 @@
----
-py3status_applets:
-  - workspaces
-  - vol
-  #- network
-  - redshift
-  - batt
-  - tztime local

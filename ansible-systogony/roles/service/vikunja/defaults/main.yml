@@ -1,6 +1,0 @@
----
-service_user:
-  name: "{{ service_user_name }}"
-  comment: "{{ description }}"
-  home: "{{ base_dir }}"
-  uid: "{{ service_user_id | default('3456') }}"

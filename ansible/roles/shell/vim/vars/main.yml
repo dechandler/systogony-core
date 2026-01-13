@@ -1,7 +1,0 @@
-packages:
-  Ubuntu:
-      - vim
-  Debian:
-      - vim
-  RedHat:
-      - vim-enhanced

@@ -1,3 +1,0 @@
-FROM ubi9-minimal
-
-RUN microdnf install sshd

@@ -1,9 +1,0 @@
----
-- include_tasks: common.yml
-  vars:
-    role: netdata
-    files:
-      - alpine/setup.sh
-      - netdata.conf
-    executable_files:
-      - setup.sh

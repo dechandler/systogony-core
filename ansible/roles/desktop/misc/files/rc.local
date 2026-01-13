@@ -1,3 +1,0 @@
-#!/bin/sh
-
-/bin/sh -c 'echo "XHC" > /proc/acpi/wakeup'

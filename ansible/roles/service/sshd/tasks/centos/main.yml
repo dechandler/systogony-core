@@ -1,4 +1,0 @@
----
-- include_tasks: centos/install.yml
-
-- include_tasks: centos/config.yml

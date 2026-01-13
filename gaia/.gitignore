@@ -1,4 +1,0 @@
-authorized_keys.*
-dnsmasq.static-hosts
-*.auth
-*.certs

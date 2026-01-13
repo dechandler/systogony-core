@@ -1,9 +1,0 @@
----
-- include_tasks: install.yml
-
-- include_role:
-    name: user/terminator
-  vars:
-    user:
-      name: root
-      home: /etc/skel

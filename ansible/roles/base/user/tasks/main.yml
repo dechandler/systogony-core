@@ -1,4 +1,0 @@
----
-- include_tasks: locals.yml
-
-- include_tasks: create.yml

@@ -1,7 +1,0 @@
----
-raspbian_img: "{{ role_path }}/files/raspbian.img"
-microsd_dev: /dev/sda
-microsd_root_dev: /dev/sda2
-tmp_mount: /dev/shm/.raspbian_tmp_mount
-wifi_network: False
-time_zone: America/Chicago

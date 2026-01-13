@@ -1,7 +1,0 @@
----
-- name: Install Python Libraries
-  yum:
-    name:
-      - policycoreutils-python-utils
-      - python3-policycoreutils
-  become: True

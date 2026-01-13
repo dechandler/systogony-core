@@ -1,6 +1,0 @@
----
-- include_tasks: "{{ system }}/main.yml"
-  when: system in ['alpine']
-
-- include_tasks: "system/main.yml"
-  when: system in ['debian', 'centos', 'fedora']

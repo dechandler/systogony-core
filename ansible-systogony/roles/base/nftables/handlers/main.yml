@@ -1,6 +1,0 @@
----
-- name: restart nftables-gen
-  systemd:
-    name: nftables-gen
-    state: restarted
-  become: True

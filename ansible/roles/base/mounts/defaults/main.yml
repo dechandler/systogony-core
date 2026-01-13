@@ -1,6 +1,0 @@
----
-lvm_package:
-  Ubuntu: lvm2
-  RedHat: lvm2
-  Debian: lvm2
-  CentOS: lvm2

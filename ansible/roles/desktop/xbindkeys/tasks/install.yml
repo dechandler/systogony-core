@@ -1,9 +1,0 @@
----
-- name: Xbindkeys | Install
-  package:
-    name: "{{ item }}"
-    state: present
-  become: True
-  with_items:
-    - xbindkeys
-    - xautomation

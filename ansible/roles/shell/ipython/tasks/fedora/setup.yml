@@ -1,8 +1,0 @@
----
-- name: >
-    fedora/setup
-    : Install Package
-  dnf:
-    name: python3-ipython
-    state: present
-  become: True

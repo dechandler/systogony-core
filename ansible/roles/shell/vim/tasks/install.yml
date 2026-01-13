@@ -1,7 +1,0 @@
----
-- name: Vim | Install
-  package:
-    name: "{{ item }}"
-    state: present
-  become: True
-  with_items: "{{ packages[ansible_facts.os_family] }}"

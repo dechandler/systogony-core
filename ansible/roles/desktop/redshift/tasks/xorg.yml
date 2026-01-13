@@ -1,8 +1,0 @@
----
-- name: >
-    install
-    : Install Redshift Package for Xorg-based Desktops
-  dnf:
-    name:
-      - redshift
-  become: True

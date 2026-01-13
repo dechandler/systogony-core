@@ -1,8 +1,0 @@
-!                  bg      fg      bgalt   hlbg    hlfg
-rofi.color-normal: #080808,#00e0e0,#1a1a1a,#586e75,#eee8d5
-!                  bg      border
-rofi.color-window: #000000,#00e0e0
-rofi.separator-style: solid
-rofi.location: 1
-rofi.yoffset: 23
-rofi.font: Ubuntu Mono 13

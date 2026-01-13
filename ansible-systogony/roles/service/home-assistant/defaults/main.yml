@@ -1,6 +1,0 @@
----
-home_assistant_service_user:
-  name: home-assistant
-  comment: Home Assistant
-  home: /var/lib/home-assistant
-  uid: 4277

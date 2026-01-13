@@ -1,8 +1,0 @@
----
-- name: >
-    prep-setup
-    : Delete Existing Script Staging Directory
-  delegate_to: localhost
-  file:
-    path: "{{ local_build_dir }}"
-    state: absent

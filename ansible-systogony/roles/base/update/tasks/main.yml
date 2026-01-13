@@ -1,6 +1,0 @@
----
-- include_tasks: redhat/main.yml
-  when: os in ['fedora', 'centos', 'alma']
-
-- include_tasks: debian/main.yml
-  when: os in ['debian', 'ubuntu']

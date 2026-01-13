@@ -1,8 +1,0 @@
----
-- name: >
-    fedora/update
-    : Update Fedora Systems
-  dnf:
-    name: '*'
-    state: latest
-  become: True

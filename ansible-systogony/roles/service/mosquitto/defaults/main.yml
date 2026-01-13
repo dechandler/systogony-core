@@ -1,6 +1,0 @@
----
-mosquitto_service_user:
-  name: mosquitto
-  comment: Mosquitto MQTT Server
-  home: /opt/mosquitto
-  uid: 1883

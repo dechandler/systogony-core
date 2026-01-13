@@ -1,5 +1,0 @@
----
-- name: >
-    main
-    : Main Setup
-  include_tasks: "{{ system }}/setup.yml"

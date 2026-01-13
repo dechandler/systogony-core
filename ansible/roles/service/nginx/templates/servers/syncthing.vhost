@@ -1,4 +1,0 @@
-{% extends "common.vhost" %}
-
-{% macro proxy_settings(location) %}
-{% endmacro %}

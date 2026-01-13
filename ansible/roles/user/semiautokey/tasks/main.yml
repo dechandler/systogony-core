@@ -1,7 +1,0 @@
----
-- name: Clone Config Repo
-  git:
-    repo: "{{ sak_config_git_remote }}"
-    dest: "{{ user.home }}/.config/semiautokey"
-  become: True
-  become_user: "{{ user.name }}"

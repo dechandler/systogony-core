@@ -1,6 +1,0 @@
----
-- name: Rofi | Install
-  package:
-    name: rofi
-    state: present
-  become: True

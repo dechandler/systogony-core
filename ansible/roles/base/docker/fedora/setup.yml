@@ -1,4 +1,0 @@
----
-- name: >
-    fedora/setup
-    : Install Podman

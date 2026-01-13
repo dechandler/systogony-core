@@ -1,4 +1,0 @@
----
-sshd_enabled: True
-sshd_port: 22
-sshd_allow_group: ssh

@@ -1,9 +1,0 @@
-XDG_DOWNLOAD_DIR="$HOME/var/downloads"
-XDG_DOCUMENTS_DIR="$HOME/var/docs"
-XDG_MUSIC_DIR="$HOME/var/music"
-XDG_PICTURES_DIR="$HOME/var/images"
-XDG_VIDEOS_DIR="$HOME/var/video"
-
-#XDG_DESKTOP_DIR="$HOME/Desktop"
-#XDG_TEMPLATES_DIR="$HOME/Templates"
-#XDG_PUBLICSHARE_DIR="$HOME/Public"
