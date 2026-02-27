@@ -72,8 +72,7 @@ class ServiceInstance(Resource):
 
 
         # Lineage for walking up and down the heirarchy
-        self.parents = [*self.interfaces.values(), host]
-        #self.parent = 
+        self.parents = [*self.interfaces.values(), host, service]
 
 
         # Other attributes
@@ -180,12 +179,12 @@ class ServiceInstance(Resource):
 
 
         for shorthand in ifaces_spec:
-            matches = self.env.query.walk_get_matches(
-                shorthand, resource_types=['network']
-            )
-            for match_net in matches.values():
-                if match_net.fqn not in self.ifaces_by_net_fqn:
-                    continue
-                iface = self.ifaces_by_net_fqn[match_net.fqn]
-                interfaces[iface.fqn] = iface
+            matches = self.env.get_shorthand_matches(shorthand)
+            for match in matches:
+                for match_net in match.networks.values():
+                    if match_net.fqn not in self.ifaces_by_net_fqn:
+                        continue
+                    iface = self.ifaces_by_net_fqn[match_net.fqn]
+                    interfaces[iface.fqn] = iface
+
         return interfaces

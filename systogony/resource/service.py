@@ -183,18 +183,17 @@ class Service(Resource):
 
     def handle_access(self):
 
+
         for shorthand, overrides in self.spec.get('access', {}).items():
 
-            resolved_hosts = self.env.query.resolve_to_rtype(
-                shorthand,
-                ['service', 'service_instance', 'host', 'network', 'interface'],
-                'hosts'
-            )
-            for host in resolved_hosts.values():
-                for inst in self.service_instances.values():
-                    host.allows[inst.host.fqn] = {
-                        'host': inst.host, 'overrides': overrides
-                    }
+            matches = self.env.get_shorthand_matches(shorthand)
+
+            for match in matches:
+                for host in match.hosts.values():
+                    for inst in self.service_instances.values():
+                        host.allows[inst.host.fqn] = {
+                            'host': inst.host, 'overrides': overrides
+                        }
 
 
     def populate_hosts(self):
@@ -209,43 +208,25 @@ class Service(Resource):
             return
 
         # Generate list of hosts but return if any shorthands have no matches
-        hosts = {}
-        host_identifiers = {}
-        for shorthand in self.spec.get('hosts', {}):
+        for shorthand, overrides in self.spec.get('hosts', {}).items():
             try:
-                resolved_hosts = self.env.query.resolve_to_rtype(
-                    shorthand,
-                    ['host', 'service_instance', 'service', 'network'],
-                    'hosts'
-                )
+                matches = self.env.get_shorthand_matches(shorthand)
             except BlueprintLoaderError:
                 log.error(f"BlueprintLoaderError for {self.name}: {shorthand}")
-                raise BlueprintLoaderError(f'Shorthand "{shorthand}" under service hosts {self.name}')
+                raise BlueprintLoaderError(f'No match for shorthand "{shorthand}" under service hosts {self.name}')
 
-            if not resolved_hosts:
-                log.debug(f"Failed to resolve hosts for {self.name}: {shorthand}")
-                raise NotReadySignal(f"No hosts for {shorthand}")
+            for match in matches:
+                if not match.hosts:
+                    log.debug(f"Failed to resolve hosts for {self.name}: {shorthand}")
+                    raise NotReadySignal(f"No hosts for {shorthand}")
 
-            hosts.update(resolved_hosts)
-            host_identifiers.update({
-                host.fqn: shorthand
-                for host in resolved_hosts.values()
-            })
-            host_identifiers[shorthand] = resolved_hosts
+            host_names = []
+            for match in matches:
+                for host in match.hosts.values():
+                    host_names.append(host.name)
+                    ServiceInstance(self.env, self, host, overrides)
+
+            self.log.info(f"Hosts running {self.name}: {', '.join(host_names)}")
 
         # Mark all host shorthands resolved
         self.hosts_complete = True
-
-        # Generate service instances on matching hosts
-        instance_names = []
-        for host in hosts.values():
-            shorthand = host_identifiers[host.fqn]
-            overrides = self.spec.get('hosts', {}).get(shorthand)
-            inst = ServiceInstance(self.env, self, host, overrides)
-            instance_names.append(inst.host.name)
-
-        log.info(' '.join([
-            f"Hosts running {self.name}:",
-            ', '.join(instance_names)
-        ]))
-

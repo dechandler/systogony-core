@@ -3,7 +3,7 @@ import logging
 
 from functools import cached_property
 
-from ..exceptions import NonMatchingPathSignal
+from ..exceptions import NonMatchingPathSignal, BlueprintLoaderError
 
 log = logging.getLogger("systogony")
 
@@ -13,6 +13,7 @@ class Resource:
     def __init__(self, env, spec):
 
         self.env = env
+        self.log = env.config.log
         self.spec = spec
 
         self.name = spec['name']
@@ -22,6 +23,8 @@ class Resource:
 
         self.fqn = tuple([(self.resource_type, spec['name'])])
         #self.fqn = tuple([*parent.fqn, fqn] if parent else [fqn])
+
+        self.fqn_str = '.'.join([ '.'.join(pair) for pair in self.fqn ])
 
         # Register 
         self.env.register(self)
@@ -149,41 +152,41 @@ class Resource:
         # Called from self.gen_acls()
 
         # Get matches for 
-        matches = {}
+        sources = {}
+        destinations = {}
+        target_specs = {}
         for shorthand, overrides in self.spec[acl_spec_type].items():
-            matches.update({
-                target.fqn: {
-                    'target': target,
-                    'overrides': {**(overrides or {})},
-                }
-                for target
-                in self.env.query.get_narrowest_matches(shorthand).values()
-            })
+            try:
+                matches = self.env.get_shorthand_matches(shorthand)
+            except BlueprintLoaderError:
+                # Leaving this as ok for now, but should let the error
+                #   surface once Listener resource is implemented
+                self.log.error(f"Lookup failure on {shorthand} in {self.name}")
+                continue
 
-        owner = {self.fqn: self}
-        owner_specs = self.vars
-        targets = {
-            fqn: target['target'] for fqn, target in matches.items()
-        }
-        target_specs = {
-            fqn: matches[fqn].get('overrides') for fqn in targets
-        }
+            for match in matches:
+                if acl_spec_type == "allows":
+                    src, dest = match, self
+                elif acl_spec_type == "access":
+                    src, dest = self, match
+                sources[src.fqn] = src
+                destinations[dest.fqn] = dest
+
+                target_specs[match.fqn] = {**(overrides or {})}
+
+
+        # TODO: generic ports
         acl_spec = {}
         if acl_spec_type == "allows":
-            sources, destinations = targets, owner
-            acl_spec['source_specs'] = target_specs
-            acl_spec['destination_specs'] = owner_specs
             ports = self.ports
+
         elif acl_spec_type == "access":
-            sources, destinations = owner, targets
-            acl_spec['source_specs'] = owner_specs
-            acl_spec['destination_specs'] = target_specs
             ports = {}
-            for target in targets.values():
+            for target in destinations.values():
                 ports.update(target.ports)
 
-        owner_str = owner[self.fqn].name
-        targets_str = '-'.join([t.name for t in targets.values()])
+        owner_str = self.name
+        targets_str = '-'.join([t.name for t in destinations.values()])
         src_str = ','.join([s.name for s in sources.values()])
         dest_str = ','.join([s.name for s in destinations.values()])
 
@@ -199,78 +202,41 @@ class Resource:
         })
         self.env.gen_acl(self, acl_spec, sources, destinations)
 
-
     def short_fqns_strs(self, targets):
 
         return [ t.short_fqn_str for t in targets.values() ]
 
 
-    def walk_matches(self, shorthand, resource_types=None):
 
+    def is_shorthand_match(self, shorthand):
+
+        # Deep copy shorthand so we can modify it without poisoning
+        #   the matching for sibling resources
         shorthand = [*shorthand]
-        log.debug(f"    walk_matches")
-        log.debug(f"        FQN: {str(self.fqn)}")
-        log.debug(f"        Shorthand: {shorthand}")
-        #log.debug(f"        Resource types: {str(resource_types)}")
 
-        #print(shorthand, self.fqn, self.resource_type)
+        # Remove matching terms from right side of working shorthand
+        if shorthand and shorthand[-1] == self.name:
+            shorthand.pop(-1)
+        if shorthand and shorthand[-1] in self.shorthand_type_matches:
+            shorthand.pop(-1)
 
-        if resource_types is None:
-            resource_types = [
-                'network', 'host', 'interface', 'service', 'service_instance'
-            ]
+        # If shorthand is empty now, this resource matches
+        if not shorthand:
+            return True
 
-        if shorthand and shorthand[-1] == self.fqn[-1][1]:
-            log.debug(f"        Matches {shorthand[-1]}")
-            if len(shorthand) == 1:
-                log.debug(f"        Popping {shorthand[-1]}")
-                shorthand.pop(-1)
-            elif (
-                len(shorthand) >= 2
-                and shorthand[-2] in self.shorthand_type_matches
-            ):  #== self.fqn[-1][0]:
-                log.debug(f"        Popping {shorthand[-2]} {shorthand[-1]}")
-                shorthand.pop(-1)
-                shorthand.pop(-1)
-            else:
-                log.debug(f"        No matching shorthand type: {shorthand[-2]} not in {self.shorthand_type_matches}")
-
-        matches = (
-            {self.fqn: self} if self.resource_type in resource_types else {}
-        )
-
-        if not shorthand:  # This and all ancestors match
-            for parent in self.parents:
-                matches.update({
-                    str(match.fqn): match
-                    for match
-                    in parent.walk_matches(shorthand, resource_types).values()
-                })
-            if matches:
-                log.debug(f"    Returning matches: {matches}")
-            return matches
-
-        if not self.parents:  # Does not match, turn back
-            # More shorthand remaining, but we've reached the top level
-            log.debug(f"    Non-matching")
-            log.debug(f"        Current object: {self.fqn}")
-            log.debug(f"        Remaining shorthand: {shorthand}")
-            raise NonMatchingPathSignal()
-
-        # Still more to go
+        # Ask each parent to check itself and its parents for
+        # matching of remaining shorthand segments
         for parent in self.parents:
-            try:
-                matches.update({
-                    match.fqn: match
-                    for match
-                    in parent.walk_matches(shorthand, resource_types).values()
-                })
-            except NonMatchingPathSignal:
-                continue
+            if parent.is_shorthand_match(shorthand):
+                return True
 
-        if matches:
-            log.debug(f"    Returning matches: {matches}")
-        return matches
+            # match = parent.is_shorthand_match(shorthand)
+            # if match:
+            #     return match
+
+        # If this resource doesn't match, and none of its
+        # parents know a match, this search tree is closed
+        return False
 
 
     def get_descendents(self, types=None):
