@@ -19,7 +19,7 @@ from ..exceptions import (
     NotReadySignal
 )
 
-log = logging.getLogger("systogony")
+#log = logging.getLogger("systogony")
 
 class Blueprint:
 
@@ -27,6 +27,7 @@ class Blueprint:
 
         self.env = env
         self.config = env.config
+        self.log = self.config.log
 
         self.svc_defaults = env.config['svc_defaults']
         #del env.config['svc_defaults']
@@ -137,7 +138,7 @@ class Blueprint:
         }
         # Load and consolidate blueprint data from files and subdirs
         bp_dir = os.path.expanduser(bp_dir)
-        log.debug(f"Loading blueprint data from {bp_dir}")
+        self.log.info(f"Loading blueprint data from {bp_dir}")
         for component, spec in blueprint.items():
 
             # Generate list of file paths for current blueprint component
@@ -156,16 +157,16 @@ class Blueprint:
 
                 try:
                     with open(path) as fh:
-                        data = yaml.safe_load(fh)
+                        data = yaml.safe_load(fh) or {}
                 except Exception as e: #(
                 #         KeyError, TypeError, UnicodeDecodeError,
                 #         yaml.scanner.ScannerError, yaml.parser.ParserError
                 # ):
-                    log.warning(f"YAML parse failure, ignoring: {path}")
+                    self.log.warning(f"YAML parse failure, ignoring: {path}")
                     continue
 
-                log.debug(f"{component} data loaded from {path}:")
-                log.debug(json.dumps(data, indent=4))
+                self.log.debug(f"{component} data loaded from {path}:")
+                self.log.debug(json.dumps(data, indent=4))
 
                 # Update component data, but update
                 # top-level dictionaries, rather
