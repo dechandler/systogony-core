@@ -56,7 +56,7 @@ class Interface(Resource):
         # self.service_instances   # property via host if self in host ifaces
 
         # Lineage for walking up and down the heirarchy
-        self.parent = network
+        self.parents = [network, host]
 
         # Other attributes
         # self.acls_ingress = {}

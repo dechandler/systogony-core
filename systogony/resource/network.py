@@ -26,9 +26,7 @@ class Network(Resource):
         self.shorthand_type_matches = ["network", "net", "subnet"]
         super().__init__(env, net_spec)
 
-
-        self.parents = [] if parent_net is None else [parent_net]
-        self.parent = parent_net
+        self.parent_net = parent_net
 
         self.network_lineage = self.get_net_lineage(self)
         self.network = self.network_lineage[0]
@@ -66,18 +64,15 @@ class Network(Resource):
 
 
         # Lineage for walking up and down the heirarchy
-        self.parent = parent_net
+        self.parents = [] if parent_net is None else [parent_net]
         self.children = self.subnets
-
-
-
-
-
 
 
         # Determine network CIDR
         if 'cidr' in net_spec:
             self.cidr = self.spec['cidr']
+        elif not parent_net:
+            raise BlueprintLoaderError(f"No CIDR specified and no parent net for {self.name}")
         elif 'cidr_prefix_offset' in net_spec and parent_net.cidr:
             self.cidr = self._get_subnet_cidr(
                 parent_net.cidr,
@@ -120,6 +115,7 @@ class Network(Resource):
             'cidr': self.cidr,
             'net_type': self.net_type,
             #'parent': net.parent,
+            'hosts': [host.short_fqn_str for host in self.hosts.values()],
             'interfaces': [iface.short_fqn_str for iface in self.interfaces.values()],
             'subnets': [*self.subnets],
             'vars': self.vars
@@ -203,9 +199,9 @@ class Network(Resource):
 
 
     def get_net_lineage(self, net):
-        if not net.parent:
+        if not net.parent_net:
             return [net] 
-        return [*self.get_net_lineage(net.parent), net]
+        return [*self.get_net_lineage(net.parent_net), net]
 
     def _get_extra_serial_data(self):
 
@@ -221,8 +217,8 @@ class Network(Resource):
     def add_host(self, host):
 
         self.hosts[host.fqn] = host
-        if self.parent.resource_type == "network":
-            self.parent.add_host(host)
+        if self.parent_net:
+            self.parent_net.add_host(host)
 
 
     def generate_isolated_networks(self, group_host_names):

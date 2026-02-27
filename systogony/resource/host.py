@@ -36,7 +36,6 @@ class Host(Resource):
 
 
         # Lineage for walking up and down the heirarchy
-        self.parent = None
         #self.children = {k: v for k, v in self.interfaces.items()}
 
         # Other attributes
@@ -61,6 +60,8 @@ class Host(Resource):
             'short_fqn': self.short_fqn_str,
             'default_iface': self.default_iface.short_fqn_str,
             'interfaces': [iface.short_fqn_str for iface in self.interfaces.values()],
+            'networks': [net.short_fqn_str for net in self.networks.values()],
+            'services': [svc.short_fqn_str for svc in self.services.values()],
             'svc_instances': [inst.short_fqn_str for inst in self.service_instances.values()],
             'vars': self.vars
         }
