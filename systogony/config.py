@@ -23,7 +23,7 @@ class SystogonyConfig(DeclibConfig):
             'secrets_dir': "secrets",
             'tf_env_dir': "terraform",
             'ansible_dir': os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "../ansible")
+                os.path.join(os.environ['HOME'], "src/systogony-automation/ansible")
             ),
 
             'environments': {},
@@ -74,7 +74,8 @@ class SystogonyConfig(DeclibConfig):
         self.raw_defaults = {}
         self.defaults = {}
 
-        # Load defaults for services
+        # Load files into raw_defaults, and set defaults if
+        #   the file doesn't reference another service
         self._load_service_default_files()
 
         # Resolve services iteratively until complete or unchanged
@@ -100,12 +101,15 @@ class SystogonyConfig(DeclibConfig):
         """
 
         """
+        # Define services.d path
+        # TODO: Move this to config file
         defaults_dir = os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             "services.d"
         )
         self.log.info(f"Svc defaults directory: {defaults_dir}")
 
+        # Walk services.d and compile list of .yaml file paths
         paths = [
             os.path.join(r, f)
             for r, _, files in os.walk(defaults_dir)
@@ -113,20 +117,25 @@ class SystogonyConfig(DeclibConfig):
             if f.endswith(".yaml")
         ]
         for path in paths:
+            # Parse filename for service name
             svc_name, _ = os.path.splitext(os.path.basename(path))
             try:
+                # Load defaults file
                 with open(path) as fh:
                     svc_vars = yaml.safe_load(fh)
                 self.log.debug(f"Loaded svc defaults: {path}")
 
             except yaml.scanner.ScannerError:
+                # Not yaml parseable - drop a warning and ignore
                 self.log.warn(f"File with .yaml extension at {path} is not YAML parseable, aborting...")
                 continue
             except Exception as e:
-                self.log.debug(' '.join([
+                # Catchall - deal with this if it comes up
+                self.log.warn(' '.join([
                     "Unexpected exception while loading",
                     f"yaml at {path}: ({e.__class__}) {e}"
                 ]))
+                continue
 
             # If a parent service isn't specified, mark as fully loaded
             if svc_vars.get('service') in [svc_name, None]:
@@ -144,6 +153,8 @@ class SystogonyConfig(DeclibConfig):
         try:
             parent_vars = {**self.defaults[parent_svc_name]}
         except KeyError:
+            # If a parent service is specified,
+            #   the referenced service should exist.
             raise MissingServiceError(
                 f"Missing from service.d: {parent_svc_name} ({svc_name}.yaml)"
             )
