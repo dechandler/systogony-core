@@ -1,5 +1,13 @@
 # Systogony Core
 
+*Sing, O Muse, of the ordering of Systems from void -*
+*of Networks hewn from chaos, Subnets apportioned by law,*
+*of Services arrayed in their stations, each bound to its Host,*
+*and the Rules that govern all passage between them,*
+*that no packet cross unbidden, and no Host stand unknown.*
+
+---
+
 Systogony Core ingests a structured blueprint - YAML files describing hosts, networks, services, and other variables - and resolves them into a calculated, fully-connected object graph. It then exposes that graph to downstream automation via a CLI and Python API, feeding structured data to Ansible and Terraform without requiring those tools to hold or re-derive environment topology themselves.
 
 **Alpha Warning**: This is tooling for personal infrastructure, not a general-purpose framework - at least at this point. Interfaces are under foundational development and subject to change without notice.
