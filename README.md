@@ -1,9 +1,9 @@
 # Systogony Core
 
-*Sing, O Muse, of the ordering of Systems from void -*
-*of Networks hewn from chaos, Subnets apportioned by law,*
-*of Services arrayed in their stations, each bound to its Host,*
-*and the Rules that govern all passage between them,*
+*Sing, O Muse, of the ordering of Systems from void -*  
+*of Networks hewn from chaos, Subnets apportioned by law,*  
+*of Services arrayed in their stations, each bound to its Host,*  
+*and the Rules that govern all passage between them,*  
 *that no packet cross unbidden, and no Host stand unknown.*
 
 ---
